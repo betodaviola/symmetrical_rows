@@ -1,0 +1,200 @@
+
+### 7. Invariant Subsets
+
+Compare transformed row forms and identify pitches, dyads, trichords, tetrachords, and ordered segments preserved between them. Store both the invariant content and the row-form transformations under which it remains invariant.
+
+### 8. Saturation and Diversity
+
+Count how many distinct directed intervals, set classes, interval vectors, and transformational forms appear at each cardinality. This describes whether a row concentrates strongly on a few materials or systematically exhausts a broad collection of possibilities.
+
+---
+
+## C. Whole-Row and Interval-Sequence Properties
+
+### 9. Retrograde-Inversional Interval Palindrome
+
+Calculate the eleven adjacent directed intervals and test whether the sequence reads identically forward and backward. When it does, determine the exact (T_nRI) operation under which the complete row is preserved.
+
+### 10. Transposed-Retrograde Anti-Palindrome
+
+Test whether each interval is the directed complement of the corresponding interval from the opposite end of the row. If true, verify the equivalent whole-row relation (P=T_6R(P)).
+
+### 11. All-Interval Property
+
+Check whether the eleven adjacent intervals contain each directed interval from 1 through 11 exactly once. This should normally be false for the present connector system because three connectors are selected from only (z) and (-z), but the detector remains useful for future row families.
+
+### 12. Periodic Interval Words
+
+Search the adjacent-interval sequence for repeated blocks of lengths two through six. Test both literal repetition and transformed repetition under inversion, reversal, or retrograde inversion.
+
+### 13. Second-Order Interval Symmetry
+
+Calculate the difference between each adjacent pair of directed intervals, producing an “interval-of-intervals” sequence. Test this second-order sequence for repetition, palindrome, anti-palindrome, periodicity, and transformational relationships.
+
+### 14. Multi-Lag Interval Structure
+
+For every lag (k=1,\ldots,6), calculate (p_{i+k}-p_i) wherever defined. Store the number of distinct values, repetitions, palindromes, periodic patterns, and relations among the lag sequences, especially (k=2,3,4,) and (6).
+
+### 15. Cyclic Rotation Plus Transposition
+
+Rotate the row by every possible number of positions and test whether the rotated row is a transposition of the original. Record the rotation amount and transposition index, paying special attention to rotations by three, four, and six positions.
+
+### 16. Cyclic Rotation Plus Inversion or RI
+
+Rotate the row by every possible amount and test whether it becomes an inversion or retrograde inversion of the original. Keep these as additional properties rather than using them to eliminate row classes, because the starting position still affects the audible partitioning.
+
+### 17. Affine and Multiplicative Relations
+
+Apply multiplication by (5) and (7), followed by all twelve transpositions, to the complete row and selected segments. Record exact ordered affine relations separately from ordinary (T/I/R/RI) relationships.
+
+---
+
+## D. Trichord Analysis
+
+### 18. Discrete Trichord Set Classes
+
+Extract the four consecutive trichords at positions (0!-!2), (3!-!5), (6!-!8), and (9!-!11). Store each trichord’s normal form, prime form, interval vector, ordered interval pair, and exact relationships to the other three.
+
+### 19. Complete Four-Form Orbit
+
+Determine whether the four discrete trichords use every distinct form among (A,A',B,B') exactly once. Also record partial orbit completion, repeated forms, two-pair balance, and the positional arrangement of the forms.
+
+### 20. Klein-Four Organization
+
+Search for two commuting order-two transformations that generate all four trichords from one source trichord. Record the two generators and verify that the fourth trichord results from applying both operations in either order.
+
+### 21. Order-Four Transpositional Cycle
+
+Test whether the four trichords form a cycle such as (F,T_3F,T_6F,T_9F), or another four-step affine orbit. Record whether the cycle preserves ordered content, set class only, and whether its four pitch collections partition the aggregate.
+
+### 22. Trichordal Tiling
+
+Determine whether one source trichord and four transpositions of it produce four disjoint sets covering all twelve pitch classes. Record the source set, transposition indices, and whether the tiling belongs to an obvious subgroup structure such as chromatic or augmented-triad partitioning.
+
+### 23. Internal Trichordal Inversional Axes
+
+For each discrete trichord, find every inversional axis that preserves its unordered pitch-class set. Compare the four axes for equality, regular progression, palindrome, complementary pairing, or cyclic organization.
+
+### 24. Sliding Trichords
+
+Extract all ten linear contiguous trichords and, separately, all twelve cyclic contiguous trichords. Store their set classes and ordered interval forms, then identify repetition, alternation, palindromes, transformation cycles, Z-relations, and overall diversity.
+
+### 25. Connector-Crossing Trichords
+
+Analyze specifically the trichords crossing each boundary between generated blocks: the final two pitches of one trichord plus the first pitch of the next, and the final pitch plus the first two pitches of the next. Compare these six boundary trichords with the four generated trichords to determine how connector direction affects trichordal coherence.
+
+---
+
+## E. Tetrachord Analysis
+
+### 26. Discrete (4+4+4) Tetrachords
+
+Extract the three tetrachords at positions (0!-!3), (4!-!7), and (8!-!11). Store their set classes, interval vectors, ordered interval sequences, and exact (T/I/R/RI) relationships.
+
+### 27. Order-Three Tetrachordal Cycle
+
+Test whether the three discrete tetrachords form a regular cycle such as (Q,T_4Q,T_8Q). Record whether the collections are disjoint, whether they cover the aggregate, and whether the ordered tetrachords follow the same operation as their unordered pitch collections.
+
+### 28. All-Interval Tetrachords
+
+Identify occurrences of the all-interval tetrachord classes ([0146]) and ([0137]) among both discrete and sliding tetrachords. Record their locations, ordered forms, Z-relations, and any multiplicative relationships between the two classes.
+
+### 29. Tetrachordal Transformation Triangle
+
+Determine the exact transformation from (Q_1) to (Q_2), from (Q_2) to (Q_3), and from (Q_3) back to (Q_1). Test whether these three transformations form a consistent closed cycle and store both uniform and mixed transformation patterns.
+
+### 30. Sliding Tetrachords
+
+Extract all nine linear contiguous tetrachords and all twelve cyclic contiguous tetrachords. Analyze their set-class sequence for repetition, alternation, Z-related pairs, palindromes, periodicity, uniform interval vectors, and recurring ordered transformations.
+
+---
+
+## F. Hexachord Analysis
+
+### 31. Exact Ordered Relation Between Halves
+
+Divide the row into (H_1=p_0\ldots p_5) and (H_2=p_6\ldots p_{11}), then test every (T_n), (I_n), (T_nR), and (I_nR) relation. Record all successful operations rather than stopping after the first.
+
+### 32. Internal Trichord Preservation
+
+When (H_2=g(H_1)), determine whether the same operation maps the two trichords inside (H_1) onto the corresponding trichords inside (H_2). Distinguish preservation in the same order, preservation with the trichords exchanged, set-class-only preservation, and loss of the internal division.
+
+### 33. Hexachordal Combinatoriality
+
+Take the first hexachord and apply every transposition, inversion, retrograde-related transformation, and retrograde inversion available through the row forms. Record every transformation producing a disjoint complementary hexachord and classify the row’s transpositional, inversional, retrograde, and RI combinatorial possibilities separately.
+
+### 34. Hexachordal Invariance Across Row Forms
+
+Compare corresponding hexachords from all relevant P, I, R, and RI forms. Record shared pitches, unordered subsets, ordered segments, and corresponding-position invariants under each transformation.
+
+### 35. All-Trichord Hexachords
+
+For each hexachord, generate all twenty unordered three-note subsets and determine how many trichord set classes are represented. Record whether the hexachord contains every trichord class and, when it does not, which classes are present or absent.
+
+### 36. Corresponding-Position Dyads
+
+Calculate the six intervals (p_{i+6}-p_i) joining corresponding positions in the two hexachords. Test the resulting sequence for constancy, repetition, palindrome, complementary pairing, interval-class coverage, and correspondence with the connector or trichord-form patterns.
+
+---
+
+## G. Cross-Partitions and Alternative Partitions
+
+### 37. (4\times3) Cross-Partition
+
+Arrange the row as four horizontal trichords and examine the three vertical tetrachords formed from corresponding trichord positions. Analyze both directions for common set classes, transformation cycles, shared axes, and whether the horizontal and vertical operations reinforce one another.
+
+### 38. (3\times4) Cross-Partition
+
+Arrange the row as three horizontal tetrachords and examine the four vertical trichords. Compare this result with the ordinary consecutive partitions and record symmetries that appear only in the interleaved arrangement.
+
+### 39. Other Interleaved Partitions
+
+Examine (2\times6), (6\times2), and other divisor-based arrays of the twelve positions. Record repeated set classes, ordered relationships, column or row cycles, and relationships between the two dimensions.
+
+### 40. Mirror-Symmetrical Unequal Partitions
+
+Test partitions such as (3+6+3), (2+4+4+2), (1+2+3+3+2+1), and (2+2+4+2+2). Compare corresponding outer blocks for T/I/R/RI relations and analyze the internal symmetry of the central block or blocks.
+
+---
+
+## H. Pitch-Class and Order-Number Properties
+
+### 41. Self-Inverse Row Permutation
+
+Interpret the row as a function in which order position (i) maps to pitch class (p_i). Test whether applying this mapping twice returns every position to itself, and record the row as a self-inverse permutation when (p_{p_i}=i) for all (i).
+
+### 42. Permutation Cycle Structure
+
+Decompose the row’s order-position mapping into disjoint permutation cycles. Record the cycle lengths, number of cycles, fixed points, and whether all cycles share a common length such as two, three, four, six, or twelve.
+
+### 43. Multiple-Order Functions
+
+Test whether systematic permutations of order positions produce transposed, inverted, retrograded, or affine versions of the row. Record the position permutation and resulting pitch-class transformation whenever an exact relationship is found.
+
+---
+
+## I. Cross-Level Organization
+
+### 44. Recursive or Self-Replicating Structure
+
+Compare the transformation pattern among individual pitches, trichords, tetrachords, and hexachords. Record cases where the same relational design reappears at more than one structural level, even when the literal pitch collections differ.
+
+### 45. Common Inversional Axis Across Levels
+
+Determine whether one inversional axis explains several relationships simultaneously, such as trichords 1 and 4, tetrachords 1 and 3, the two hexachords, and the complete row. Also search for regularly progressing or palindromically arranged axes when no single common axis exists.
+
+### 46. Transformation Propagation
+
+When a transformation relates two smaller blocks, test whether the same operation also relates the larger blocks containing them. Record separately whether the relationship propagates from trichords to tetrachords, trichords to hexachords, tetrachords to hexachords, or all the way to the complete row.
+
+### 47. Connector Completion of Larger Transformations
+
+Determine whether the connector signs allow two adjacent trichords to combine into tetrachords or hexachords related by an exact transformation. Record which connector positions complete, interrupt, or reverse the larger relationship.
+
+### 48. Maximally Even Subsets
+
+Identify augmented-triad, diminished-seventh, whole-tone, and other maximally even collections among discrete, sliding, cyclic, and interleaved subsets. Analyze each cardinality separately rather than expecting the maximally even trichord, tetrachord, and hexachord to form one nested chain.
+
+### 49. Overall Cross-Cardinality Summary
+
+Summarize which transformations, axes, interval patterns, and set classes recur at cardinalities three, four, six, and twelve. This final analysis field should describe the row’s structural organization without yet converting those findings into a numerical grade.

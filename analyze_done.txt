@@ -1,0 +1,41 @@
+ Twelve-Tone Row Analysis Checklist
+
+## A. Generating Description
+
+### 1. Derivation Count
+
+Record every generating description that produces the same row class, rather than keeping only the first. Store the total number of derivations and whether they involve genuinely different (x,y,z), connector, or trichord-distribution configurations.
+
+### 2. Equal Internal Intervals: (x=y)
+
+Record whether any derivation uses (x=y), producing trichords with repeated directed intervals. Because this belongs to the generating description rather than necessarily to the canonical row class itself, distinguish “all derivations,” “some derivations,” and “no derivations” with (x=y).
+
+### 3. Connector Direction Profile
+
+Record the actual connector sequence, such as ((3,9,3)), and its sign representation, such as ((+,-,+)). Classify it as uniformly positive, uniformly negative, mixed, alternating, palindromic, anti-palindromic, or otherwise irregular.
+
+### 4. Trichord-Form Distribution
+
+Record the ordered sequence of (A,A',B,B') forms used by each derivation. Identify complete four-form orbits, literal repetition, balanced pairs, alternation, palindromic distributions, and asymmetric arrangements.
+
+MINE: ADD CALCULATE j, AND TESTING IF j EQUALS z OR -z
+ONCE j IS THERE, GO BACK TO ANALYSIS PART OF THE CODE. EXCLUDE FIRST AND LAST ITEMS OF THE CONCATENATIONS
+THE REST OF THE PROCESS CAN STAY THE SAME
+THINK IF YOU WANT TO INCLUDE J IN THE "intervals" IN THE DICTIONARY OR IF THAT IS NOT STANDARD NOTATION
+IF NOT STANDARD, ADD AGAIN ON ANALYSIS PART
+
+## B. General Transformation Inventory
+
+### 5. Whole-Row Stabilizing Symmetries
+
+Apply every relevant nonidentity operation to the complete row and test whether the result equals the original row after the required transposition or rotation. Record the exact operations that preserve it, such as (T_nRI), (T_6R), rotation-transposition, or
+
+Collect all valid affine relations for ordinary rotational symmetry in array. Keep all valid P/I/R/RI rotational relations in arrays, rather than only one result, while later deciding which ones are redundant enough to summarize.
+Make sure you are collecting rotational AND altered affine relations, and that finding rotational ones is not excludint the I R RI results
+Keep output “concisely complete.” Store enough exact operations to reconstruct the relationships, but later summarize obvious generated repetitions when appropriate.
+
+
+
+### 6. Relations Between Different Segments
+
+For every selected pair of trichords, tetrachords, or hexachords, determine whether one is an exact (T), (I), (R), or (RI) transformation of the other. Record the operation and transposition or inversion index rather than merely recording that the two segments are related.
