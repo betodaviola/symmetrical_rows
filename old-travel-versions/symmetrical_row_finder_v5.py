@@ -518,15 +518,11 @@ def main():
     tetrachordal_relations = segment_relations(row_classes, 4)
     hexachordal_relations = segment_relations(row_classes, 6)
 
-    #symmetry_printing(analysis_results)
-    #print(affine_results)
-    #print(trichordal_relations)
-    #print(tetrachordal_relations)
-    #print(hexachordal_relations)
-
-    print(tetrachordal_relations[0])
-    for i in tetrachordal_relations:
-        print(i)
+    symmetry_printing(analysis_results)
+    print(affine_results)
+    print(trichordal_relations)
+    print(tetrachordal_relations)
+    print(hexachordal_relations)
 
 if __name__ == "__main__":
     main()
