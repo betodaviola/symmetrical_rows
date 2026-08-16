@@ -257,11 +257,111 @@ def rotational_symmetry_analysis(row_dict):
 
     return analysis_results
 
+
+def affine_relations(row, affine_row, source_intervals, affine_altered_intervals, slices):
+    #slices are 3 for trichord symmetry, 4 for tetrachord symmetry, and 6 for hexachord symmetry
+    if slices == 3:
+        segment_type = "trichords"
+    elif slices == 4:
+        segment_type = "tetrachords"
+    elif slices == 6:
+        segment_type = "hexachords"
+    
+    affine_segment_relationships = []
+
+    sliced_source_pitches = []
+    sliced_source_intervals = []
+    sliced_target_pitches = []
+    sliced_target_intervals = []
+
+    # Divide the row pitches and intervals into trichords, tetrachords, or hexachords
+    for i in range(12):
+        if i % slices == 0:
+            pitch_source_group = row[i:i + slices]
+            sliced_source_pitches.append(tuple(pitch_source_group))
+
+            interval_source_group = source_intervals[i:i + (slices - 1)]
+            sliced_source_intervals.append(tuple(interval_source_group))
+
+            pitch_target_group = affine_row[i:i + slices]
+            sliced_target_pitches.append(tuple(pitch_target_group))
+
+            interval_target_group = affine_altered_intervals[i:i + (slices - 1)]
+            sliced_target_intervals.append(tuple(interval_target_group))
+
+    for segment_idx in product(range(len(sliced_source_pitches)), range(len(sliced_source_pitches))):
+        source = segment_idx[0]
+        target = segment_idx[1]
+
+        source_pitches = sliced_source_pitches[source]
+        target_pitches = sliced_target_pitches[target]
+
+        source_intervals = sliced_source_intervals[source]
+        target_intervals = sliced_target_intervals[target]
+
+        relations = []
+        # Make the source interval forms for P, I, R, and RI
+        P_intervals = source_intervals
+
+        I_intervals = tuple(
+            (-interval) % 12 for interval in source_intervals
+        )
+
+        R_intervals = tuple(
+            (-interval) % 12 for interval in reversed(source_intervals)
+        )
+
+        RI_intervals = tuple(
+            reversed(source_intervals)
+        )
+
+        # Get the pitch versions of I, R, and RI
+        I, R, RI = analysis_operations(source_pitches)
+
+        # T
+        if target_intervals == P_intervals:
+            transposition = (
+                target_pitches[0] - source_pitches[0]
+            ) % 12
+            relations.append(f"T{transposition}")
+
+        # I
+        if target_intervals == I_intervals:
+            transposition = (
+                target_pitches[0] - I[0]
+            ) % 12
+            relations.append(f"T{transposition}I")
+
+        # R
+        if target_intervals == R_intervals:
+            transposition = (
+                target_pitches[0] - R[0]
+            ) % 12
+            relations.append(f"T{transposition}R")
+
+        # RI
+        if target_intervals == RI_intervals:
+            transposition = (
+                target_pitches[0] - RI[0]
+            ) % 12
+            relations.append(f"T{transposition}RI")
+                
+        output_data = {
+            "pair": (source, target),
+            "relations": relations
+        }
+
+        affine_segment_relationships.append(output_data)
+
+    return segment_type, affine_segment_relationships
+
 def affine_analysis(row_classes):
     row_list = []
     affine_row_list = []
     affine_matrix_keys = []
     affine_relationship = []
+
+    segment_relation_list = []
 
     #extract rows
     for result in row_classes:
@@ -278,6 +378,13 @@ def affine_analysis(row_classes):
             new_pitch = (affine_row[i - 1] + affine_altered_intervals[i - 1]) % 12
             affine_row.append(new_pitch)
         affine_row_list.append(tuple(affine_row)) # creates a list with the affine rows
+        #find all segment simmetries
+        all_segment_relations = {}
+        for slice_size in (3, 4, 6):
+            segment_type, affine_segment_relationships = affine_relations(row, affine_row, source_intervals, affine_altered_intervals, slice_size)
+            chord_size_label = f"{segment_type} relations"
+            all_segment_relations[chord_size_label] = affine_segment_relationships
+        segment_relation_list.append(all_segment_relations)
         # finds the matrix key for each affine row in the list and makes a list with them
     for affine in affine_row_list:
         inversion, retrograde, retrograde_inversion = trivial_operations(affine)
@@ -296,15 +403,15 @@ def affine_analysis(row_classes):
             original_row = row_list[index]
             original_intervals = get_cyclic_intervals(original_row)
 
-            affine_relations = calculate_rotation_symmetry(
+            affine_rotation_relations = calculate_rotation_symmetry(
                 affine_row,
                 original_intervals,
                 exclude_zero=False,
             )
 
             # Check every direct M5 relation.
-            if affine_relations is not None:
-                for relation in affine_relations:
+            if affine_rotation_relations is not None:
+                for relation in affine_rotation_relations:
                     rotation, transposition = relation
 
                     relations.append(
@@ -350,14 +457,14 @@ def affine_analysis(row_classes):
         else:
             original_row = row_list[affine_relation_id]
             original_intervals = get_cyclic_intervals(original_row)
-            affine_relations = calculate_rotation_symmetry(
+            affine_rotation_relations = calculate_rotation_symmetry(
                 affine_row,
                 original_intervals,
                 exclude_zero=False,
             )
 
-            if affine_relations is not None:
-                for symmetry in affine_relations:
+            if affine_rotation_relations is not None:
+                for symmetry in affine_rotation_relations:
                     rotation, transposition = symmetry
                     relations.append(
                         f"T{transposition}ρ{rotation}M5"
@@ -396,12 +503,14 @@ def affine_analysis(row_classes):
                     )
             affine_relationship.append({
                 "partner": affine_relation_id,
-                "relation": relations
+                "relation": relations,
+                "segment_relationships": segment_relation_list[index]
             })
 
     return affine_relationship
 
-def segment_relations(row_classes, slices):
+def segment_relations(row_classes, slices): 
+    #slices are 3 for trichord symmetry, 4 for tetrachord symmetry, and 6 for hexachord symmetry
     segment_relationships = []
 
     for item in row_classes:
@@ -413,7 +522,7 @@ def segment_relations(row_classes, slices):
         sliced_pitches = []
         sliced_intervals = []
 
-        # Divide the row into trichords, tetrachords, or hexachords
+        # Divide the row pitches and intervals into trichords, tetrachords, or hexachords
         for i in range(12):
             if i % slices == 0:
                 pitch_group = row[i:i + slices]
@@ -482,6 +591,8 @@ def segment_relations(row_classes, slices):
 
     return segment_relationships
 
+
+
 def symmetry_printing(analysis_results):
     for row_id, symmetries in enumerate(analysis_results):
         operation_labels = []
@@ -518,11 +629,13 @@ def main():
     tetrachordal_relations = segment_relations(row_classes, 4)
     hexachordal_relations = segment_relations(row_classes, 6)
 
-    symmetry_printing(analysis_results)
+    #symmetry_printing(analysis_results)
+    
+    #print(trichordal_relations)
+    #print(tetrachordal_relations)
+    #print(hexachordal_relations)
+
     print(affine_results)
-    print(trichordal_relations)
-    print(tetrachordal_relations)
-    print(hexachordal_relations)
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,5 @@
 none of the 11 self-affine classes has any tetrachord relation at all. worth investigating if ther is a mathematicam relation ther and even including in a paper
 
 Every one of the 113 non-self M5 affine pairs has the same internal symmetry profile.The 11 self-affine classes become especially interesting in light of this. All 11 have at least one ordinary whole-row self-symmetry which is related to that
+
+explain the segment results later: "Every net relation TnX(A)=B has four equivalent two-sided descriptions obtained by applying P, I, R, and RI to both segments; the database stores only the one that leaves the target segment as written."
