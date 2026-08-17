@@ -345,13 +345,14 @@ def affine_relations(row, affine_row, source_intervals, affine_altered_intervals
                 target_pitches[0] - RI[0]
             ) % 12
             relations.append(f"T{transposition}RI")
-                
-        output_data = {
-            "pair": (source, target),
-            "relations": relations
-        }
+      
+        if relations:
+            output_data = {
+                "pair": (source, target),
+                "relations": relations
+            }
 
-        affine_segment_relationships.append(output_data)
+            affine_segment_relationships.append(output_data)
 
     return segment_type, affine_segment_relationships
 
@@ -360,8 +361,6 @@ def affine_analysis(row_classes):
     affine_row_list = []
     affine_matrix_keys = []
     affine_relationship = []
-
-    segment_relation_list = []
 
     #extract rows
     for result in row_classes:
@@ -377,15 +376,10 @@ def affine_analysis(row_classes):
         for i in range(1, 12):
             new_pitch = (affine_row[i - 1] + affine_altered_intervals[i - 1]) % 12
             affine_row.append(new_pitch)
+
         affine_row_list.append(tuple(affine_row)) # creates a list with the affine rows
-        #find all segment simmetries
-        all_segment_relations = {}
-        for slice_size in (3, 4, 6):
-            segment_type, affine_segment_relationships = affine_relations(row, affine_row, source_intervals, affine_altered_intervals, slice_size)
-            chord_size_label = f"{segment_type} relations"
-            all_segment_relations[chord_size_label] = affine_segment_relationships
-        segment_relation_list.append(all_segment_relations)
-        # finds the matrix key for each affine row in the list and makes a list with them
+
+    # finds the matrix key for each affine row in the list and makes a list with them
     for affine in affine_row_list:
         inversion, retrograde, retrograde_inversion = trivial_operations(affine)
         affine_matrix_key = min(affine, inversion, retrograde, retrograde_inversion)
@@ -394,6 +388,20 @@ def affine_analysis(row_classes):
     for index, affine_testing_row in enumerate(affine_matrix_keys):
         affine_relation_id = row_list.index(affine_testing_row)
         affine_row = affine_row_list[index]
+
+        # The source is the canonical row currently being analyzed.
+        # affine_testing_row is the canonical P0 of its affine partner.
+        source_row = row_list[index]
+        source_intervals = get_cyclic_intervals(source_row)
+        affine_partner_intervals = get_cyclic_intervals(affine_testing_row)
+
+        #find all segment simmetries between the two canonical rows
+        all_segment_relations = {}
+        for slice_size in (3, 4, 6):
+            segment_type, affine_segment_relationships = affine_relations(source_row, affine_testing_row, source_intervals, affine_partner_intervals, slice_size)
+            chord_size_label = f"{segment_type} relations"
+            if affine_segment_relationships:
+                all_segment_relations[chord_size_label] = (affine_segment_relationships)
 
         # A new list is created for every row so relations cannot carry over
         # from the previous row.
@@ -452,11 +460,14 @@ def affine_analysis(row_classes):
 
             affine_relationship.append({
                 "partner": "self",
-                "relation": relations
+                "relation": relations,
+                "segment_relationships": all_segment_relations
             })
+
         else:
             original_row = row_list[affine_relation_id]
             original_intervals = get_cyclic_intervals(original_row)
+
             affine_rotation_relations = calculate_rotation_symmetry(
                 affine_row,
                 original_intervals,
@@ -466,6 +477,7 @@ def affine_analysis(row_classes):
             if affine_rotation_relations is not None:
                 for symmetry in affine_rotation_relations:
                     rotation, transposition = symmetry
+
                     relations.append(
                         f"T{transposition}ρ{rotation}M5"
                     )
@@ -501,10 +513,14 @@ def affine_analysis(row_classes):
                         f"ρ{rotation}"
                         f"{operation_type}M5"
                     )
+            if all_segment_relations:
+                segments_display = all_segment_relations
+            else:
+                segments_display = None
             affine_relationship.append({
                 "partner": affine_relation_id,
                 "relation": relations,
-                "segment_relationships": segment_relation_list[index]
+                "segment_relationships": segments_display
             })
 
     return affine_relationship
@@ -590,7 +606,6 @@ def segment_relations(row_classes, slices):
         segment_relationships.append(row_relationships)
 
     return segment_relationships
-
 
 
 def symmetry_printing(analysis_results):

@@ -1,3 +1,244 @@
+Invariance Analysis — Coding/Design Guide
+1. Canonical segments vs. sliding windows
+
+Use different relevance rules for each.
+
+Canonical segments
+
+Analyze the row's designed partitions:
+4 trichords
+3 tetrachords
+2 hexachords
+Allow partial invariance.
+Even 1–2 invariant pitches may be worth storing because the segment boundary itself is structurally meaningful.
+Never delete a canonical result merely because it is contained inside a larger sliding result.
+
+Sliding windows
+
+Use them to detect invariance that the fixed 3/4/6 partitions cannot reveal, especially cardinalities such as 5.
+Require a much stronger result, preferably complete collectional invariance of the window.
+Store only maximal/nonredundant sliding invariants.
+If a sliding result exactly coincides with a canonical 3/4/6 segment, classify it as canonical rather than storing it twice.
+2. Removing redundant sliding results
+
+Do not try to prevent redundancy during the search.
+
+Find all candidate sliding invariants.
+Run a cleanup pass afterward.
+
+If:
+
+2–4 → invariant trichord
+2–5 → invariant tetrachord
+2–6 → invariant pentachord
+
+and each larger result genuinely extends the invariant collection, keep only the pentachord.
+
+General rule:
+
+If larger windows contain the smaller windows in both rows and also contain a larger invariant collection, the smaller result is redundant.
+
+But if:
+
+2–4 → {1,4,8}
+1–5 → {1,4,8}
+
+keep the smaller result because the larger window adds only non-invariant context.
+
+Canonical 3/4/6 results are exempt from this cleanup.
+
+3. Fixed pitches under inversion
+
+For:
+
+T
+n
+	​
+
+I(x)=n−x
+
+a pitch is individually fixed when:
+
+2x=n(mod12).
+
+Therefore:
+
+T0I  → 0,6
+T2I  → 1,7
+T4I  → 2,8
+T6I  → 3,9
+T8I  → 4,10
+T10I → 5,11
+
+Odd inversional transpositions have no individually fixed PCs.
+
+The identity of these fixed PCs is determined by the operation, but their serial positions are determined by the row.
+
+Example with row #69:
+
+P = 0 2 5 6 8 11 10 1 3 4 7 9
+
+Under I0, fixed PCs are 0 and 6:
+
+0 occurs at position 0
+6 occurs at position 3
+
+Under T4I, fixed PCs are 2 and 8:
+
+2 occurs at position 1
+8 occurs at position 4
+
+So positional information remains row-specific and potentially useful.
+
+4. Fixed pitches are not the same as invariant collections
+
+A collection can be invariant even when some pitches exchange with each other.
+
+Example: row #14 under I0.
+
+First hexachords share:
+
+{0,4,8}.
+
+Here:
+
+0→0,4↔8.
+
+So {0,4,8} is an invariant trichord even though only 0 is individually fixed.
+
+The second hexachords share:
+
+{2,6,10},
+
+with:
+
+6→6,2↔10.
+
+This is more informative than merely counting fixed points.
+
+5. What to suppress
+
+Suppress only relationships that are completely guaranteed and therefore add no row-specific information:
+
+identity comparisons;
+full 12-PC aggregate invariance;
+Pn ↔ PnR invariance at the automatically mirrored location;
+PnI ↔ PnRI invariance at the automatically mirrored location;
+duplicate direction (A ↔ B and B ↔ A);
+redundant smaller sliding invariants.
+
+Do not currently suppress:
+
+the automatic fixed pitch pair of even inversional forms;
+single-pitch invariants inside canonical segments;
+invariant dyads inside canonical segments;
+larger invariant collections containing those automatic fixed pitches.
+
+Principle:
+
+Filter guaranteed relationships, not guaranteed ingredients.
+
+A fixed pitch may be mathematically guaranteed, but whether it participates in an invariant dyad/trichord/tetrachord or falls at an important position is row-specific.
+
+6. Comparison strategy
+
+For ordinary invariance:
+
+P
+0
+	​
+
+ vs. all relevant T
+n
+	​
+
+P, T
+n
+	​
+
+I, T
+n
+	​
+
+R, T
+n
+	​
+
+RI
+	​
+
+
+rather than every row form against every row form.
+
+For affine invariance:
+
+P
+0
+	​
+
+ vs. all T
+n
+	​
+
+M
+5
+	​
+
+, T
+n
+	​
+
+IM
+5
+	​
+
+, T
+n
+	​
+
+RM
+5
+	​
+
+, T
+n
+	​
+
+RIM
+5
+	​
+
+	​
+
+
+of the M5 partner.
+
+This avoids huge amounts of equivalent duplicated data.
+
+7. Later follow-up
+
+After the main invariance system works, analyze the distribution of invariant positions.
+
+Example:
+
+X . . X . . X . . X . .
+
+could reveal cyclic periodicity every 3 serial positions.
+
+Keep this separate from invariant detection itself; calculate it afterward as a descriptor of the invariant-position pattern.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 7. Invariant Subsets
 
