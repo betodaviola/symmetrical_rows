@@ -845,7 +845,7 @@ def main():
 
     #print(affine_results)
 
-    print(invariants)
+    #print(invariants)
 
 if __name__ == "__main__":
     main()

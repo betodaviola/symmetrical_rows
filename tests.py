@@ -1,210 +1,177 @@
-from symmetrical_rows import get_cyclic_intervals, analysis_operations, trivial_operations
-from itertools import product, combinations
+# No invariant positions at all
+row_no_cycle_a = (4, 5, 7, 8, 0, 10, 1, 9, 2, 3, 11, 6)
+row_no_cycle_b = (5, 7, 8, 0, 10, 1, 9, 2, 3, 11, 6, 4)
+# Two invariant positions, true cyclic period 6
+row_period_6_a = (7, 5, 2, 8, 9, 6, 11, 3, 4, 0, 1, 10)
+row_period_6_b = (7, 2, 8, 9, 6, 3, 11, 4, 0, 1, 10, 5)
+# Three invariant positions, true cyclic period 4
+row_period_4_a = (5, 7, 2, 9, 10, 6, 4, 8, 3, 1, 11, 0)
+row_period_4_b = (5, 2, 9, 6, 10, 4, 8, 1, 3, 11, 0, 7)
+# Four invariant positions, true cyclic period 3
+row_period_3_a = (8, 10, 5, 2, 11, 1, 6, 0, 4, 9, 7, 3)
+row_period_3_b = (8, 5, 11, 2, 1, 0, 6, 4, 7, 9, 3, 10)
+# Six invariant positions, true cyclic period 2
+row_period_2_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+row_period_2_b = (2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1)
+# Three irregular invariant positions
+row_irregular_a = (11, 8, 7, 4, 10, 2, 0, 6, 9, 1, 5, 3)
+row_irregular_b = (11, 4, 7, 10, 2, 0, 9, 6, 1, 5, 3, 8)
+# Thee invariant positions separated by 5 [0, 5, 10]
+row_spacing_5_a = (11, 0, 3, 2, 7, 5, 9, 4, 10, 6, 1, 8)
+row_spacing_5_b = (11, 3, 2, 7, 9, 5, 4, 10, 6, 8, 1, 0)
+# Double cycle x y . .
+double_cycle_1_a = (1, 2, 3, 3, 1, 2, 3, 3, 1, 2, 3, 3)
+double_cycle_1_b = (1, 2, 4, 4, 1, 2, 4, 4, 1, 2, 4, 4)
+# Every four but dirty
+edge_tests_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+edge_tests_b = (1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0)
+#shifted 4s
+shifted_4s_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+shifted_4s_b = (0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0)
 
-# From the current generated system:
-row_69 = (0, 2, 5, 6, 8, 11, 10, 1, 3, 4, 7, 9)
-row_1 = (0, 1, 2, 5, 4, 3, 6, 7, 8, 11, 10, 9)
+def cyclic_invariants(source_row, target_row):
+    invariance_indices = []
 
-# Arbitrary twelve-tone rows outside the generating system:
-row_a = (0, 4, 1, 7, 3, 10, 2, 9, 5, 11, 6, 8)
-row_b = (0, 7, 3, 10, 4, 1, 8, 5, 11, 2, 9, 6)
+    for i in range(12):
+        if source_row[i] == target_row[i]:
+            invariance_indices.append(i)
+    gaps = []
+    for i in range(1, len(invariance_indices)):
+        gaps.append(invariance_indices[i] - invariance_indices[i - 1])
 
-# Deliberately constructed to contain useful local ordered material:
-row_c = (0, 2, 5, 9, 1, 7, 4, 10, 3, 11, 6, 8)
-row_d = (9, 1, 7, 0, 4, 10, 3, 2, 11, 6, 8, 5)
+    print(gaps)
+    return gaps, invariance_indices
 
-row_list = [row_69, row_1, row_a, row_b, row_c, row_d]
+def find_gap_pattern(gaps, invariance_indices):
+    pattern_size = 1
+    repeating_pattern = None
+    relevant_invariant_indices = []
 
-def get_invariance_comparison(source_row, target_row, segment_size):
-#find every segment of size n in a row
-    segmented_source = []
-    segmented_target = []
-    invariance_list = []
+    while pattern_size <= len(gaps) // 2:
 
-    for i in range(len(source_row) - segment_size + 1):
-        source_segment = source_row[i:i + segment_size]
-        segmented_source.append(source_segment)
-        target_segment = target_row[i:i + segment_size]
-        segmented_target.append(target_segment)
+        # Take the first n gaps as the candidate repeating pattern.
+        candidate = gaps[0:pattern_size]
 
-    for source_index in range(len(segmented_source)):
-        for target_index in range(len(segmented_target)):
-            source_pitches = segmented_source[source_index]
-            target_pitches = segmented_target[target_index]
+        matches = True
+        checking_index = pattern_size
 
-            invariant_pitches = tuple(sorted(set(source_pitches) & set(target_pitches)))
-            invariance_cardinality = len(invariant_pitches)
+        while checking_index < len(gaps):
 
-            if invariance_cardinality != 0:
-                if segment_size == 3 and source_index % segment_size == 0 and target_index % segment_size == 0:
-                    note = "trichordal"
-                elif segment_size == 4 and source_index % segment_size == 0 and target_index % segment_size == 0:
-                    note = "tetrachordal"
-                elif segment_size == 6 and source_index % segment_size == 0 and target_index % segment_size == 0:
-                    note = "hexachordal"
-                else:
-                    note = "noncanonical/sliding"
-                
-                invariance_list.append({
-                    "index pair": (source_index, target_index),
-                    "cardinality": invariance_cardinality,
-                    "segment_length": segment_size,
-                    "invariant pitches": invariant_pitches,
-                    "non-triviality": note
-                })
+            # Take the next chunk.
+            # At the end of the row, this chunk may be shorter
+            # than the complete candidate pattern.
+            checking_chunk = gaps[
+                checking_index:checking_index + pattern_size
+            ]
 
-    return invariance_list
-
-def clean_invariants(invariance_results):
-    canonical_results = []
-    sliding_results = []
-
-    # Separate canonical results from sliding results.
-    # Canonical results are always kept.
-    # Sliding results are kept only if the whole segment is invariant.
-    for result in invariance_results:
-        if result["non-triviality"] == "noncanonical/sliding":
-            if result["cardinality"] == result["segment_length"]:
-                sliding_results.append(result)
-        else:
-            canonical_results.append(result)
-
-    # Check larger sliding invariants first.
-    sliding_results.sort(key=lambda result: result["segment_length"], reverse=True)
-
-    kept_sliding = []
-
-    for result in sliding_results:
-        redundant = False
-
-        source_start = result["index pair"][0]
-        target_start = result["index pair"][1]
-        segment_size = result["segment_length"]
-
-        for larger in kept_sliding:
-            larger_source_start = larger["index pair"][0]
-            larger_target_start = larger["index pair"][1]
-            larger_size = larger["segment_length"]
-
-            # Check whether this result is contained inside the larger
-            # invariant in both the source row and target row.
-            source_contained = (
-                larger_source_start <= source_start
-                and larger_source_start + larger_size >= source_start + segment_size
-            )
-
-            target_contained = (
-                larger_target_start <= target_start
-                and larger_target_start + larger_size >= target_start + segment_size
-            )
-
-            # Also make sure the smaller invariant pitch collection
-            # is actually contained in the larger invariant collection.
-            pitches_contained = set(result["invariant pitches"]).issubset(
-                larger["invariant pitches"]
-            )
-
-            if source_contained and target_contained and pitches_contained:
-                redundant = True
+            # Compare the chunk with the same-length beginning
+            # of the candidate. This allows the row to end partway
+            # through an otherwise repeating pattern.
+            if checking_chunk != candidate[:len(checking_chunk)]:
+                matches = False
                 break
 
-        if not redundant:
-            kept_sliding.append(result)
+            checking_index += pattern_size
 
-    return canonical_results + kept_sliding
+        if matches:
+            repeating_pattern = candidate
+            relevant_invariant_indices = invariance_indices.copy()
+            break
 
-def invariance_finder(row_classes):
-    invariants = []
-    for row in row_classes:
-        row_invariants = []
-        inversion, retrograde, retrograde_inversion = analysis_operations(row)
-        # find the affine version of the row
-        source_intervals = get_cyclic_intervals(row)
-        affine_altered_intervals = [(x * 5) % 12 for x in source_intervals]
-        affine_row = [0]
-        for i in range(1, 12):
-            new_pitch = (affine_row[i - 1] + affine_altered_intervals[i - 1]) % 12
-            affine_row.append(new_pitch)
-        #get the afine i r and ri
-        affine_row = tuple(affine_row)
-        m5_i, m5_r, m5_ri = trivial_operations(affine_row)
-        affine_matrix_key = min(affine_row, m5_i, m5_r, m5_ri)
-        affine_p = affine_matrix_key
-        affine_i, affine_r, affine_ri = analysis_operations(affine_p)
+        pattern_size += 1
 
-        #generate rows to compare
-        p_ts = []
-        i_ts = []
-        r_ts = []
-        ri_ts = []
-        m5p_ts = []
-        m5i_ts = []
-        m5r_ts = []
-        m5ri_ts = []
+    if repeating_pattern:
+        period = sum(repeating_pattern)
+        occurrences = len(gaps) // len(repeating_pattern)
+    else:
+        period = None
+        occurrences = None
 
-        for t in range(12):
-            t_p = tuple((pitch + t) % 12 for pitch in row)
-            p_ts.append(t_p)
-            i_p = tuple((pitch + t) % 12 for pitch in inversion)
-            i_ts.append(i_p)
-            r_p = tuple((pitch + t) % 12 for pitch in retrograde)
-            r_ts.append(r_p)
-            ri_p = tuple((pitch + t) % 12 for pitch in retrograde_inversion)
-            ri_ts.append(ri_p)
-            m5t_p = tuple((pitch + t) % 12 for pitch in affine_p)
-            m5p_ts.append(m5t_p)
-            m5i_p = tuple((pitch + t) % 12 for pitch in affine_i)
-            m5i_ts.append(m5i_p)
-            m5r_p = tuple((pitch + t) % 12 for pitch in affine_r)
-            m5r_ts.append(m5r_p)
-            m5ri_p = tuple((pitch + t) % 12 for pitch in affine_ri)
-            m5ri_ts.append(m5ri_p)
+    return repeating_pattern, period, occurrences, relevant_invariant_indices
 
-        row_variation_labels = ["T", "I", "R", "RI"]
-        comparing_row_list = [p_ts, i_ts, r_ts, ri_ts, m5p_ts, m5i_ts, m5r_ts, m5ri_ts]
+def find_hidden_patterns(gaps, candidate_period, invariance_indices):
+    gap_index = 0
+    gaps_used = 0
+    hidden_gaps = []
+    repeating_pattern = None
+    period = None
+    occurrences = None
 
-        for tgt_ls_i, tgt_ls in enumerate(comparing_row_list):
-            op_type = ''
+    relevant_invariant_indices = [invariance_indices[gap_index]]
 
-            if tgt_ls_i > 0 and tgt_ls_i < 4:
-                op_type = row_variation_labels[tgt_ls_i]
+    while gaps_used < len(gaps):
+        gap_sum = 0
 
-            if tgt_ls_i > 4:
-                op_type = row_variation_labels[tgt_ls_i - 4]
+        while gap_sum < candidate_period and gap_index < len(gaps):
+            #this is very smart. it loops through the list without gettin out of bounds
+            #because it stays inside mod n where n is the list lenghth. goes from 0 to n - 1
+            #no longer necessary: gap = gaps[gap_index % len(gaps)] 
+            gap = gaps[gap_index] 
 
-            for tgt_i, tgt in enumerate(tgt_ls):
-                label = f"T{tgt_i}{f'{op_type}' if op_type else ''}"
+            gap_sum += gap
+            gap_index += 1
+            gaps_used += 1
 
-                if tgt_ls_i > 3:
-                    label += " of affine partner"
+        if gap_sum == candidate_period:
+            hidden_gaps.append(gap_sum)
+            relevant_invariant_indices.append(invariance_indices[gap_index])
+        else:
+            break
 
-                all_invariance_results = []
 
-                for segment_size in range(3, 7):
-                    invariance_list = get_invariance_comparison(row, tgt, segment_size)
-                    all_invariance_results.extend(invariance_list)
+    if len(hidden_gaps) > 1:
+        repeating_pattern, period, occurrences, relevant_invariant_indices = find_gap_pattern(hidden_gaps, relevant_invariant_indices)
 
-                cleaned_invariants = clean_invariants(all_invariance_results)
+    return repeating_pattern, period, occurrences, relevant_invariant_indices
 
-                segment_invariants = {}
+def analyze_invariant_periodicity(source_row, target_row):
+    gaps, invariance_indices = cyclic_invariants(source_row, target_row)
+    embeded = False
+    cyclic = False
 
-                for result in cleaned_invariants:
-                    segment_size = result["segment_length"]
+    if len(invariance_indices) < 3:
+        return None, None, None, False
 
-                    if segment_size not in segment_invariants:
-                        segment_invariants[segment_size] = []
+    repeating_pattern, period, occurrences, relevant_invariant_indices = find_gap_pattern(gaps, invariance_indices)
+    
+    regular_invariants = []
+    for candidate_period in (range(2, 6)):
+        if not repeating_pattern:
+            repeating_pattern, period, occurrences, relevant_invariant_indices = find_hidden_patterns(gaps,candidate_period, invariance_indices)
+            if repeating_pattern:
+                embeded = True
 
-                    segment_invariants[segment_size].append(result)
+        if repeating_pattern:
+            pattern_gaps_used = len(relevant_invariant_indices) - 1
+            next_pattern_index = (pattern_gaps_used % len(repeating_pattern))
+            next_expected_gap = repeating_pattern[next_pattern_index]
+            boundary_gap = (12 + relevant_invariant_indices[0] - relevant_invariant_indices[-1])
+            if boundary_gap == next_expected_gap:
+                cyclic = True
+        
 
-                row_invariants.append({
-                    "row-form_relation": label,
-                    "invariants": segment_invariants
-                })
 
-        invariants.append(row_invariants)
+        
 
-    return invariants
+    return repeating_pattern, period, occurrences, relevant_invariant_indices, embeded
 
-print(invariance_finder(row_list))
+    
 
+
+
+
+
+
+
+
+#periodicity_data = analyze_invariant_periodicity(row_period_6_a, row_period_6_b)
+#periodicity_data = analyze_invariant_periodicity(row_spacing_5_a, row_spacing_5_b)
+#periodicity_data = analyze_invariant_periodicity(row_period_4_a, row_period_4_b)
+#periodicity_data = analyze_invariant_periodicity(shifted_4s_a, shifted_4s_b)
+#periodicity_data = analyze_invariant_periodicity(row_period_3_a, row_period_3_b)
+#periodicity_data = analyze_invariant_periodicity(double_cycle_1_a, double_cycle_1_b)
+#periodicity_data = analyze_invariant_periodicity(row_no_cycle_a, row_no_cycle_b)
+periodicity_data = analyze_invariant_periodicity(edge_tests_a, edge_tests_b)
+
+print(periodicity_data)
 

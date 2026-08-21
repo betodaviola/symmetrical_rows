@@ -1,7 +1,10 @@
 4. Later remove redundant sliding invariants.
 5. Later add cyclic spacing analysis of invariant positions.
 
-
+SUPER CYCLICAL ROWWWWS
+SUPER CYCLICAL ROWWWWS
+SUPER CYCLICAL ROWWWWS
+SUPER CYCLICAL ROWWWWS
 
 After the main invariance system works, analyze the distribution of invariant positions.
 
