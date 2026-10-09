@@ -1,33 +1,7 @@
-# No invariant positions at all
-row_no_cycle_a = (4, 5, 7, 8, 0, 10, 1, 9, 2, 3, 11, 6)
-row_no_cycle_b = (5, 7, 8, 0, 10, 1, 9, 2, 3, 11, 6, 4)
-# Two invariant positions, true cyclic period 6
-row_period_6_a = (7, 5, 2, 8, 9, 6, 11, 3, 4, 0, 1, 10)
-row_period_6_b = (7, 2, 8, 9, 6, 3, 11, 4, 0, 1, 10, 5)
-# Three invariant positions, true cyclic period 4
-row_period_4_a = (5, 7, 2, 9, 10, 6, 4, 8, 3, 1, 11, 0)
-row_period_4_b = (5, 2, 9, 6, 10, 4, 8, 1, 3, 11, 0, 7)
-# Four invariant positions, true cyclic period 3
-row_period_3_a = (8, 10, 5, 2, 11, 1, 6, 0, 4, 9, 7, 3)
-row_period_3_b = (8, 5, 11, 2, 1, 0, 6, 4, 7, 9, 3, 10)
-# Six invariant positions, true cyclic period 2
-row_period_2_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-row_period_2_b = (2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1)
-# Three irregular invariant positions
-row_irregular_a = (11, 8, 7, 4, 10, 2, 0, 6, 9, 1, 5, 3)
-row_irregular_b = (11, 4, 7, 10, 2, 0, 9, 6, 1, 5, 3, 8)
-# Thee invariant positions separated by 5 [0, 5, 10]
-row_spacing_5_a = (11, 0, 3, 2, 7, 5, 9, 4, 10, 6, 1, 8)
-row_spacing_5_b = (11, 3, 2, 7, 9, 5, 4, 10, 6, 8, 1, 0)
-# Double cycle x y . .
-double_cycle_1_a = (1, 2, 3, 3, 1, 2, 3, 3, 1, 2, 3, 3)
-double_cycle_1_b = (1, 2, 4, 4, 1, 2, 4, 4, 1, 2, 4, 4)
-# Every four but dirty
-edge_tests_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-edge_tests_b = (1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0)
-#shifted 4s
-shifted_4s_a = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-shifted_4s_b = (0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0)
+from pprint import pprint
+
+from symmetrical_rows import get_related_rows
+from symmetrical_rows import matrix_finder
 
 def cyclic_invariants(source_row, target_row):
     invariance_indices = []
@@ -39,139 +13,244 @@ def cyclic_invariants(source_row, target_row):
     for i in range(1, len(invariance_indices)):
         gaps.append(invariance_indices[i] - invariance_indices[i - 1])
 
-    print(gaps)
     return gaps, invariance_indices
 
 def find_gap_pattern(gaps, invariance_indices):
-    pattern_size = 1
     repeating_pattern = None
     relevant_invariant_indices = []
 
-    while pattern_size <= len(gaps) // 2:
+    # First test the complete circular gap sequence.
+    boundary_gap = (
+        12
+        + invariance_indices[0]
+        - invariance_indices[-1]
+    )
 
-        # Take the first n gaps as the candidate repeating pattern.
-        candidate = gaps[0:pattern_size]
+    circular_gaps = gaps + [boundary_gap]
 
-        matches = True
-        checking_index = pattern_size
+    pattern_size = 1
 
-        while checking_index < len(gaps):
+    while pattern_size <= len(circular_gaps) // 2:
 
-            # Take the next chunk.
-            # At the end of the row, this chunk may be shorter
-            # than the complete candidate pattern.
-            checking_chunk = gaps[
-                checking_index:checking_index + pattern_size
-            ]
+        # A repeating pattern must divide the complete
+        # circular gap sequence evenly.
+        if len(circular_gaps) % pattern_size != 0:
+            pattern_size += 1
+            continue
 
-            # Compare the chunk with the same-length beginning
-            # of the candidate. This allows the row to end partway
-            # through an otherwise repeating pattern.
-            if checking_chunk != candidate[:len(checking_chunk)]:
-                matches = False
-                break
+        candidate = circular_gaps[0:pattern_size]
 
-            checking_index += pattern_size
+        repetitions = (
+            len(circular_gaps) // pattern_size
+        )
 
-        if matches:
+        if candidate * repetitions == circular_gaps:
             repeating_pattern = candidate
             relevant_invariant_indices = invariance_indices.copy()
             break
 
         pattern_size += 1
 
+    # If the complete circular sequence is not periodic,
+    # look for a repeating pattern visible within the written row.
+    if not repeating_pattern:
+        pattern_size = 1
+
+        while pattern_size <= len(gaps) // 2:
+
+            candidate = gaps[0:pattern_size]
+
+            matches = True
+            checking_index = pattern_size
+
+            while checking_index < len(gaps):
+
+                checking_chunk = gaps[
+                    checking_index:checking_index + pattern_size
+                ]
+
+                if checking_chunk != candidate[:len(checking_chunk)]:
+                    matches = False
+                    break
+
+                checking_index += pattern_size
+
+            if matches:
+                repeating_pattern = candidate
+                relevant_invariant_indices = invariance_indices.copy()
+                break
+
+            pattern_size += 1
+
     if repeating_pattern:
         period = sum(repeating_pattern)
-        occurrences = len(gaps) // len(repeating_pattern)
+        occurrences = (
+            len(gaps) // len(repeating_pattern)
+        )
     else:
         period = None
         occurrences = None
 
-    return repeating_pattern, period, occurrences, relevant_invariant_indices
+    return (repeating_pattern, period, occurrences, relevant_invariant_indices)
 
 def find_hidden_patterns(gaps, candidate_period, invariance_indices):
-    gap_index = 0
-    gaps_used = 0
-    hidden_gaps = []
-    repeating_pattern = None
-    period = None
-    occurrences = None
+    hidden_results = []
 
-    relevant_invariant_indices = [invariance_indices[gap_index]]
+    # Try every gap as a possible beginning of a hidden pattern.
+    for starting_gap in range(len(gaps)):
+        gap_index = starting_gap
+        hidden_gaps = []
+        relevant_invariant_indices = [invariance_indices[starting_gap]]
 
-    while gaps_used < len(gaps):
-        gap_sum = 0
+        while gap_index < len(gaps):
+            gap_sum = 0
 
-        while gap_sum < candidate_period and gap_index < len(gaps):
-            #this is very smart. it loops through the list without gettin out of bounds
-            #because it stays inside mod n where n is the list lenghth. goes from 0 to n - 1
-            #no longer necessary: gap = gaps[gap_index % len(gaps)] 
-            gap = gaps[gap_index] 
+            # Keep combining consecutive gaps until we reach
+            # or exceed the candidate period.
+            while gap_sum < candidate_period and gap_index < len(gaps):
+                gap_sum += gaps[gap_index]
+                gap_index += 1
 
-            gap_sum += gap
-            gap_index += 1
-            gaps_used += 1
+            if gap_sum == candidate_period:
+                hidden_gaps.append(gap_sum)
+                relevant_invariant_indices.append(
+                    invariance_indices[gap_index]
+                )
+            else:
+                break
 
-        if gap_sum == candidate_period:
-            hidden_gaps.append(gap_sum)
-            relevant_invariant_indices.append(invariance_indices[gap_index])
-        else:
-            break
+        # Normal in-row periodicity needs at least two occurrences.
+        # Period 6 is the exception: one occurrence can become
+        # periodic when the same row comparison repeats.
+        if (len(hidden_gaps) > 1 or (candidate_period == 6 and len(hidden_gaps) == 1)):
+            embedded = (len(relevant_invariant_indices) < len(invariance_indices))
+
+            result = {
+                "period": candidate_period,
+                "pattern": (candidate_period,),
+                "gap_occurrences": len(hidden_gaps),
+                "indices": tuple(relevant_invariant_indices),
+                "embedded": embedded
+            }
+
+            # Avoid storing exactly the same result twice.
+            if result not in hidden_results:
+                hidden_results.append(result)
+
+    return hidden_results
 
 
-    if len(hidden_gaps) > 1:
-        repeating_pattern, period, occurrences, relevant_invariant_indices = find_gap_pattern(hidden_gaps, relevant_invariant_indices)
+def analyze_invariant_periodicity(row_classes):
+    periodic_invariants = []
+    for item in row_classes:
+        source_row = item["row"]
 
-    return repeating_pattern, period, occurrences, relevant_invariant_indices
+        labels_list, related_row_lists = get_related_rows(source_row)
+        regular_invariants = {}
+        for target_list_i, target_list in enumerate(related_row_lists):
+            for target_i, target_row in enumerate(target_list):
+                label = labels_list[target_list_i][target_i]
 
-def analyze_invariant_periodicity(source_row, target_row):
-    gaps, invariance_indices = cyclic_invariants(source_row, target_row)
-    embeded = False
-    cyclic = False
+                if target_list_i == 0 and target_i == 0:
+                    continue
 
-    if len(invariance_indices) < 3:
-        return None, None, None, False
+                gaps, invariance_indices = cyclic_invariants(source_row, target_row)
 
-    repeating_pattern, period, occurrences, relevant_invariant_indices = find_gap_pattern(gaps, invariance_indices)
+                
+                periodicity_results = []
+
+                # Fewer than two invariants cannot produce even the
+                # special repeat-only period-6 case.
+                if len(invariance_indices) < 2:
+                    continue
+
+                # First find a pattern directly visible in the complete gap list.
+                (
+                    repeating_pattern,
+                    period,
+                    occurrences,
+                    relevant_invariant_indices
+                ) = find_gap_pattern(gaps, invariance_indices)
+
+                if repeating_pattern:
+                    periodicity_results.append({
+                        "period": period,
+                        "pattern": tuple(repeating_pattern),
+                        "gap_occurrences": occurrences,
+                        "indices": tuple(relevant_invariant_indices),
+                        "embedded": False
+                    })
+
+                # Search ALL candidate periods even if a direct pattern
+                # was already found.
+                for candidate_period in range(2, 7):
+                    hidden_results = find_hidden_patterns(
+                        gaps,
+                        candidate_period,
+                        invariance_indices
+                    )
+
+                    for result in hidden_results:
+                        duplicate = False
+
+                        for existing_result in periodicity_results:
+                            if (
+                                result["period"] == existing_result["period"]
+                                and result["pattern"] == existing_result["pattern"]
+                                and set(result["indices"]).issubset(existing_result["indices"])
+                            ):
+                                duplicate = True
+                                break
+
+                        if not duplicate:
+                            periodicity_results.append(result)
+
+                # Test each discovered pattern independently for continuation
+                # across repetition of the same row comparison.
+                for result in periodicity_results:
+                    pattern = result["pattern"]
+                    relevant_indices = result["indices"]
+
+                    pattern_gaps_used = len(relevant_indices) - 1
+
+                    next_pattern_index = (
+                        pattern_gaps_used % len(pattern)
+                    )
+
+                    next_expected_gap = pattern[next_pattern_index]
+
+                    boundary_gap = (
+                        12
+                        + relevant_indices[0]
+                        - relevant_indices[-1]
+                    )
+
+                    # The boundary must continue the expected pattern,
+                    # and the pattern phase must reset correctly for the
+                    # next copy of the row.
+                    if (
+                        boundary_gap == next_expected_gap
+                        and len(relevant_indices) % len(pattern) == 0
+                        and 12 % result["period"] == 0
+                    ):
+                        result["cyclic"] = True
+                    else:
+                        result["cyclic"] = False
+
+                related_row = label
+
+                if periodicity_results:
+                    regular_invariants[related_row] = periodicity_results
+
+        periodic_invariants.append(regular_invariants)
+    return periodic_invariants
     
-    regular_invariants = []
-    for candidate_period in (range(2, 6)):
-        if not repeating_pattern:
-            repeating_pattern, period, occurrences, relevant_invariant_indices = find_hidden_patterns(gaps,candidate_period, invariance_indices)
-            if repeating_pattern:
-                embeded = True
 
-        if repeating_pattern:
-            pattern_gaps_used = len(relevant_invariant_indices) - 1
-            next_pattern_index = (pattern_gaps_used % len(repeating_pattern))
-            next_expected_gap = repeating_pattern[next_pattern_index]
-            boundary_gap = (12 + relevant_invariant_indices[0] - relevant_invariant_indices[-1])
-            if boundary_gap == next_expected_gap:
-                cyclic = True
-        
+row_classes = matrix_finder()
+
+periodicity_data = analyze_invariant_periodicity(row_classes)
 
 
-        
-
-    return repeating_pattern, period, occurrences, relevant_invariant_indices, embeded
-
-    
-
-
-
-
-
-
-
-
-#periodicity_data = analyze_invariant_periodicity(row_period_6_a, row_period_6_b)
-#periodicity_data = analyze_invariant_periodicity(row_spacing_5_a, row_spacing_5_b)
-#periodicity_data = analyze_invariant_periodicity(row_period_4_a, row_period_4_b)
-#periodicity_data = analyze_invariant_periodicity(shifted_4s_a, shifted_4s_b)
-#periodicity_data = analyze_invariant_periodicity(row_period_3_a, row_period_3_b)
-#periodicity_data = analyze_invariant_periodicity(double_cycle_1_a, double_cycle_1_b)
-#periodicity_data = analyze_invariant_periodicity(row_no_cycle_a, row_no_cycle_b)
-periodicity_data = analyze_invariant_periodicity(edge_tests_a, edge_tests_b)
-
-print(periodicity_data)
+with open("periodicity_output.txt", "w") as file:
+    pprint(periodicity_data, stream=file, width=120, sort_dicts=False)
 
